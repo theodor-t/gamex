@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Секс-Фанты Адаптив</title>
+<style>
+  /* --- Сброс --- */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at center, #1a1a1a, #000);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 30px;
+  }
+
+  /* --- Логи справа --- */
+  #logContainer {
+    width: 500px;
+    background: rgba(255, 0, 100, 0.15);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 0, 100, 0.3);
+    font-size: 14px;
+    color: #ff77aa;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    user-select: none;
+    max-height: 90vh;
+    position: sticky;
+    top: 20px;
+    flex-shrink: 0;
+  }
+  /* Для Webkit-браузеров (Chrome, Safari, Edge) */
+#logContainer::-webkit-scrollbar {
+  width: 10px;               /* ширина вертикального скролла */
+  background: transparent;   /* фон самого скролла */
+}
+
+#logContainer::-webkit-scrollbar-track {
+  background: rgba(255, 0, 100, 0.1); /* трек — слегка прозрачный */
+  border-radius: 10px;
+  box-shadow: inset 0 0 10px #ff0066;
+}
+
+#logContainer::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ff00aa, #ff3399);
+  border-radius: 10px;
+  box-shadow:
+    0 0 8px #ff3399,
+    inset 0 0 6px #ff00aa;
+  transition: background 0.3s ease;
+}
+
+#logContainer::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #ff33cc, #ff66bb);
+  box-shadow:
+    0 0 12px #ff66bb,
+    inset 0 0 8px #ff33cc;
+}
+
+/* Для Firefox */
+#logContainer {
+  scrollbar-width: thin;
+  scrollbar-color: #ff3399 rgba(255, 0, 100, 0.1);
+}
+
+  #logContainer h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #ff0066;
+    text-align: center;
+    text-shadow: 0 0 10px #ff3399;
+  }
+  #logList {
+    list-style: none;
+    padding-left: 10px;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+  }
+  #logList li {
+    margin-bottom: 6px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    background: rgba(255, 0, 100, 0.05);
+    box-shadow: inset 0 0 8px rgba(255, 0, 100, 0.2);
+    word-break: break-word;
+  }
+  #logList li:hover {
+    background: rgba(255, 0, 100, 0.15);
+  }
+
+  /* --- Кнопка показа/скрытия логов (для мобилок) --- */
+  #toggleLogBtn {
+    display: none; /* будет показана на мобилках */
+    margin: 0 auto 10px auto;
+    padding: 14px 30px;
+    font-size: 20px;
+    border-radius: 14px;
+    background: #ff0066;
+    color: #fff;
+    box-shadow: 0 0 12px #ff3399;
+    border: none;
+    cursor: pointer;
+    max-width: 400px;
+    width: 100%;
+    user-select: none;
+    transition: background 0.3s ease;
+  }
+  #toggleLogBtn:hover {
+    background: #ff3399;
+  }
+
+  /* --- Основной контейнер игры и настроек --- */
+  #mainWrapper {
+    max-width: 450px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* --- Контейнер стартового блока и игры --- */
+  #setup, #game {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* --- Заголовок формы --- */
+  #setup h2 {
+    margin-bottom: 15px;
+  }
+
+  /* --- Инпуты, селекты, кнопки --- */
+  input, select, button {
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 18px;
+    margin: 8px 0;
+    cursor: pointer;
+    background: #2c2c2c;
+    color: #ff66aa;
+    box-shadow: 0 0 8px #ff0066;
+    transition: background 0.3s ease, color 0.3s ease;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  input:focus, select:focus, button:focus {
+    outline: none;
+    background: #ff0066;
+    color: #fff;
+    box-shadow: 0 0 12px #ff3399;
+  }
+
+  /* --- Текущий игрок --- */
+  #currentPlayer {
+    font-size: 24px;
+    font-weight: 700;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: 0 0 10px #ff0066;
+    color: #ff66aa;
+    background: #1a001a;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  /* --- Выбор сложности --- */
+  #difficultySelect {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  #difficultySelect label {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 20px;
+    user-select: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    border: 2px solid #ff0066;
+    color: #ff66aa;
+    background: #1a001a;
+    box-shadow: 0 0 8px #ff0066;
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    min-width: 90px;
+    text-align: center;
+  }
+  #difficultySelect input[type="radio"] {
+    display: none;
+  }
+  #difficultySelect input[type="radio"]:checked + label {
+    background: #ff0066;
+    color: #fff;
+    box-shadow: 0 0 20px #ff3399;
+    border-color: #ff3399;
+  }
+  #difficultySelect label:hover {
+    background: #ff004c;
+    color: #fff;
+    box-shadow: 0 0 14px #ff66aa;
+  }
+
+  /* --- Карточка задания --- */
+  #card {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    min-height: 220px;
+    background: linear-gradient(135deg, #2c2c2c, #3d3d3d);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+    font-size: 24px;
+    box-shadow: 0 0 20px rgba(255, 0, 100, 0.4);
+    cursor: pointer;
+    transition: transform 0.4s ease, background 0.3s ease, opacity 0.4s ease;
+    user-select: none;
+    margin: 20px auto;
+    color: #fff;
+    text-shadow: 0 0 10px #ff0066, 0 0 20px #ff0066;
+    white-space: pre-wrap;
+    opacity: 1;
+    overflow: visible;
+    z-index: 2;
+    border: 2px solid transparent;
+  }
+  #card.gold {
+    background: linear-gradient(135deg, gold, orange);
+    color: #000;
+    box-shadow: 0 0 40px 8px gold;
+    font-weight: bold;
+    text-shadow: none;
+    animation: pulseGold 2s infinite;
+  }
+  @keyframes pulseGold {
+    0%, 100% { box-shadow: 0 0 40px 8px gold; }
+    50% { box-shadow: 0 0 60px 14px gold; }
+  }
+
+  /* --- Сердечки и звёздочки анимация --- */
+  .floating-effect {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    animation: floatUp 3s ease forwards;
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-100px) scale(1.5);
+    }
+  }
+
+  /* --- Табло очков --- */
+  .scoreboard {
+    margin-top: 15px;
+    font-size: 22px;
+    background: rgba(255, 0, 100, 0.2);
+    padding: 14px 25px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(255, 0, 100, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    user-select: none;
+  }
+
+  /* --- Таймер --- */
+  #timerControls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    max-width: 400px;
+    width: 100%;
+  }
+  #timerControls input[type="number"] {
+    width: 90px;
+    font-size: 18px;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #2c2c2c;
+    color: #ff66aa;
+  }
+  #timerControls button {
+    flex-grow: 1;
+    max-width: 120px;
+    font-size: 18px;
+    padding: 14px 10px;
+    border-radius: 12px;
+    border: none;
+    background: #ff0066;
+    color: #fff;
+    box-shadow: 0 0 12px #ff3399;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #timerControls button:hover {
+    background: #ff3399;
+  }
+
+  #timerDisplay {
+    margin-top: 15px;
+    font-size: 28px;
+    text-align: center;
+    user-select: none;
+    font-weight: 700;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* --- Адаптив --- */
+  @media (max-width: 850px) {
+    body {
+      flex-direction: column;
+      align-items: center;
+      padding: 15px 10px;
+      gap: 15px;
+    }
+    #logContainer {
+      position: static;
+      width: 100%;
+      max-height: 300px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 0, 100, 0.3);
+      overflow-y: auto;
+      order: 2;
+      display: none; /* по умолчанию скрыт */
+      margin-top: 0;
+      max-height: 300px;
+      flex-shrink: 0;
+    }
+    #toggleLogBtn {
+      display: block;
+      order: 1;
+      margin-bottom: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    #mainWrapper {
+      max-width: 450px;
+      width: 100%;
+      padding: 0 10px;
+      order: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    input, select, button {
+      font-size: 20px;
+      padding: 16px;
+      max-width: 100%;
+    }
+    #currentPlayer {
+      font-size: 26px;
+      padding: 18px 30px;
+      max-width: 100%;
+    }
+    #difficultySelect label {
+      font-size: 20px;
+      padding: 14px 24px;
+    }
+    #card {
+      font-size: 24px;
+      min-height: 220px;
+    }
+    .scoreboard {
+      font-size: 22px;
+      padding: 16px 20px;
+    }
+    #timerControls input[type="number"] {
+      width: 90px;
+      font-size: 18px;
+      padding: 14px;
+    }
+    #timerControls button {
+      max-width: 130px;
+      font-size: 18px;
+      padding: 14px 10px;
+    }
+    #timerDisplay {
+      font-size: 28px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="mainWrapper">
+    <div id="setup">
+      <h2>Начать игру</h2>
+      <input type="text" id="player1Name" placeholder="Имя Игрока 1" />
+      <select id="player1Gender" aria-label="Пол Игрока 1">
+        <option value="male">Мужчина</option>
+        <option value="female">Женщина</option>
+      </select>
+      <input type="text" id="player2Name" placeholder="Имя Игрока 2" />
+      <select id="player2Gender" aria-label="Пол Игрока 2">
+        <option value="male">Мужчина</option>
+        <option value="female">Женщина</option>
+      </select>
+      <button id="startGame">Начать игру</button>
+    </div>
+
+    <div id="game" class="hidden">
+      <select id="currentPlayer" aria-label="Выбор текущего игрока"></select>
+
+      <div id="difficultySelect" role="radiogroup" aria-label="Выбор сложности">
+        <input type="radio" name="difficulty" id="diffEasy" value="easy" checked />
+        <label for="diffEasy">Легко</label>
+
+        <input type="radio" name="difficulty" id="diffMedium" value="medium" />
+        <label for="diffMedium">Средне</label>
+
+        <input type="radio" name="difficulty" id="diffHard" value="hard" />
+        <label for="diffHard">Сложно</label>
+      </div>
+
+      <div class="scoreboard" id="scoreBoard"></div>
+      <div id="card" role="button" tabindex="0" aria-pressed="false" aria-label="Задание для игрока">❤️</div>
+
+      <div id="timerControls">
+        <input
+          type="number"
+          id="minutes"
+          placeholder="Минуты"
+          min="0"
+          aria-label="Минуты для таймера"
+        />
+        <input
+          type="number"
+          id="seconds"
+          placeholder="Секунды"
+          min="0"
+          max="59"
+          aria-label="Секунды для таймера"
+        />
+        <button id="startTimerBtn">Старт</button>
+        <button id="resetTimerBtn">Сброс</button>
+      </div>
+
+      <div id="timerDisplay" aria-live="polite" aria-atomic="true"></div>
+
+      <button id="toggleLogBtn" aria-expanded="false" aria-controls="logContainer" aria-label="Показать или скрыть логи">ЛОГИ</button>
+    </div>
+  </div>
+
+  <div id="logContainer" aria-live="polite" aria-label="Лог выполненных заданий">
+    <h3>Лог заданий</h3>
+    <ul id="logList"></ul>
+  </div>
+
+<script>
+  const tasks = {
+    male: {
+      easy: [
+        "Сними одежду и встань раком перед партнёршей",
+        "Скажи ей: 'Я твой' и подари 2 минуты оральных ласк",
+        "Дай ей пощёчину по попе и скажи похабную фразу",
+      ],
+      medium: [
+        "Обними партнёршу и прошепчи ей что-то очень страстное",
+        "Сделай массаж спины в течение 5 минут",
+        "Используй губы и язык для ласки шеи партнёрши",
+      ],
+      hard: [
+        "Получи от партнёрши 5 пощечин с чувством",
+        "Сделай страстный поцелуй и удерживай его 2 минуты",
+        "Выполни танец живота с эротическим подтекстом",
+      ],
+    },
+    female: {
+      easy: [
+        "Стань на колени и попроси: 'Возьми меня сейчас'",
+        "Сядь на лицо партнёру и двигайся 2 минуты",
+        "Сделай анилингус, не отрываясь, 30 секунд",
+      ],
+      medium: [
+        "Обними партнёра и прошепчи что-то очень сексуальное",
+        "Нежно погладь его плечи и шею в течение 5 минут",
+        "Используй руки для лёгких ласк по всему телу",
+      ],
+      hard: [
+        "Выполни ролевую игру с использованием аксессуаров",
+        "Используй язык для стимуляции эрогенных зон партнёра",
+        "Сделай страстный танец перед ним с элементами флирта",
+      ],
+    },
+    special: [
+      "Специальное задание: поцелуй в шею с закрытыми глазами",
+      "Специальное задание: страстно обними партнёра и прошепчи комплимент",
+      "Специальное задание: сделай массаж с маслом на протяжении 5 минут",
+    ],
+  };
+
+  const usedTasks = {
+    male: { easy: [], medium: [], hard: [] },
+    female: { easy: [], medium: [], hard: [] },
+  };
+
+  let players = {};
+  const score = { player1: 0, player2: 0 };
+
+  const currentPlayerSelect = document.getElementById("currentPlayer");
+  const card = document.getElementById("card");
+  const scoreBoard = document.getElementById("scoreBoard");
+  const logContainer = document.getElementById("logContainer");
+  const logList = document.getElementById("logList");
+  const toggleLogBtn = document.getElementById("toggleLogBtn");
+  const timerDisplay = document.getElementById("timerDisplay");
+
+  let timerInterval = null;
+  let timerEndTime = null;
+
+  function addLog(message) {
+    const li = document.createElement("li");
+    li.textContent = message;
+    logList.prepend(li);
+    if (logList.children.length > 100) {
+      logList.removeChild(logList.lastChild);
+    }
+  }
+
+  function getRandomTask(gender, difficulty) {
+    const arr = tasks[gender][difficulty];
+    const usedArr = usedTasks[gender][difficulty];
+    if (usedArr.length === arr.length) {
+      usedTasks[gender][difficulty] = [];
+    }
+    let task;
+    do {
+      task = arr[Math.floor(Math.random() * arr.length)];
+    } while (usedTasks[gender][difficulty].includes(task));
+    usedTasks[gender][difficulty].push(task);
+    return task;
+  }
+
+  function createFloatingEffect(char, color) {
+    const effect = document.createElement("div");
+    effect.textContent = char;
+    effect.className = "floating-effect";
+    effect.style.color = color;
+    effect.style.left = Math.random() * 80 + 10 + "%";
+    effect.style.top = "90%";
+    effect.style.fontSize = (Math.random() * 24 + 20) + "px";
+    effect.style.animationDelay = (Math.random() * 0.5) + "s";
+    effect.style.zIndex = 5;
+    card.appendChild(effect);
+    setTimeout(() => {
+      effect.remove();
+    }, 3000);
+  }
+
+  function animateCardChange(newText, isSpecial) {
+    card.style.opacity = "0";
+    card.style.transform = "scale(0.8)";
+    setTimeout(() => {
+      card.textContent = newText;
+      if (isSpecial) {
+        card.classList.add("gold");
+      } else {
+        card.classList.remove("gold");
+      }
+      card.style.opacity = "1";
+      card.style.transform = "scale(1)";
+
+      // Добавляем эффекты сердечек и звёздочек
+      for (let i = 0; i < 7; i++) {
+        const isHeart = Math.random() < 0.5;
+        createFloatingEffect(isHeart ? "❤️" : "✨", isHeart ? "#ff3366" : "#fff9a6");
+      }
+    }, 400);
+  }
+
+  function startGame() {
+    const p1Name = document.getElementById("player1Name").value.trim() || "Игрок 1";
+    const p2Name = document.getElementById("player2Name").value.trim() || "Игрок 2";
+    const p1Gender = document.getElementById("player1Gender").value;
+    const p2Gender = document.getElementById("player2Gender").value;
+
+    players = {
+      player1: { name: p1Name, gender: p1Gender, score: 0 },
+      player2: { name: p2Name, gender: p2Gender, score: 0 },
+    };
+
+    score.player1 = 0;
+    score.player2 = 0;
+
+    currentPlayerSelect.innerHTML = "";
+    for (const key in players) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = players[key].name;
+      currentPlayerSelect.appendChild(option);
+    }
+
+    document.getElementById("setup").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+
+    updateScoreboard();
+    showNextTask();
+
+    addLog(`Игра начата: ${p1Name} и ${p2Name}`);
+  }
+
+  function showNextTask() {
+    const currentPlayerKey = currentPlayerSelect.value;
+    const player = players[currentPlayerKey];
+    if (!player) return;
+
+    const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+    let task = getRandomTask(player.gender, difficulty);
+
+    // С вероятностью 5% — спец-задание
+    const isSpecial = Math.random() < 0.05;
+    if (isSpecial) {
+      const specialArr = tasks.special;
+      task = specialArr[Math.floor(Math.random() * specialArr.length)];
+    }
+
+    animateCardChange(task, isSpecial);
+    addLog(`${player.name} (${difficulty}) получил задание: ${task}`);
+  }
+
+  function updateScoreboard() {
+    scoreBoard.innerHTML = `
+      <b>${players.player1.name}:</b> ${score.player1} &nbsp;&nbsp;&nbsp;
+      <b>${players.player2.name}:</b> ${score.player2}
+    `;
+  }
+
+  currentPlayerSelect.addEventListener("change", () => {
+    showNextTask();
+  });
+
+  document.getElementById("startGame").addEventListener("click", () => {
+    startGame();
+  });
+
+  card.addEventListener("click", () => {
+    const currentPlayerKey = currentPlayerSelect.value;
+    score[currentPlayerKey]++;
+    updateScoreboard();
+    showNextTask();
+  });
+
+  // Таймер
+  function startCustomTimer() {
+    clearInterval(timerInterval);
+    const minutes = parseInt(document.getElementById("minutes").value) || 0;
+    const seconds = parseInt(document.getElementById("seconds").value) || 0;
+    let totalSeconds = minutes * 60 + seconds;
+    if (totalSeconds <= 0) return;
+
+    timerEndTime = Date.now() + totalSeconds * 1000;
+    updateTimerDisplay(totalSeconds);
+    timerInterval = setInterval(() => {
+      const now = Date.now();
+      let diff = Math.max(0, Math.round((timerEndTime - now) / 1000));
+      updateTimerDisplay(diff);
+      if (diff <= 0) {
+        clearInterval(timerInterval);
+        alert("Время вышло!");
+      }
+    }, 250);
+  }
+
+  function updateTimerDisplay(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    timerDisplay.textContent = `${m.toString().padStart(2, "0")}:${s
+      .toString()
+      .padStart(2, "0")}`;
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerDisplay.textContent = "";
+    document.getElementById("minutes").value = "";
+    document.getElementById("seconds").value = "";
+  }
+
+  document.getElementById("startTimerBtn").addEventListener("click", startCustomTimer);
+  document.getElementById("resetTimerBtn").addEventListener("click", resetTimer);
+
+  // Логи — кнопка показа/скрытия на мобилках
+  toggleLogBtn.addEventListener("click", () => {
+    if (logContainer.style.display === "block") {
+      logContainer.style.display = "none";
+      toggleLogBtn.setAttribute("aria-expanded", "false");
+    } else {
+      logContainer.style.display = "block";
+      toggleLogBtn.setAttribute("aria-expanded", "true");
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+  });
+
+  // Проверяем размер экрана при загрузке и при изменении размера
+  function checkScreenSize() {
+    if (window.innerWidth > 850) {
+      logContainer.style.display = "flex";
+      toggleLogBtn.style.display = "none";
+      toggleLogBtn.setAttribute("aria-expanded", "false");
+    } else {
+      logContainer.style.display = "none";
+      toggleLogBtn.style.display = "block";
+      toggleLogBtn.setAttribute("aria-expanded", "false");
+    }
+  }
+  window.addEventListener("resize", checkScreenSize);
+  window.addEventListener("load", checkScreenSize);
+</script>
+</body>
+</html>
