@@ -350,30 +350,46 @@
   @media (max-width: 850px) {
     body {
       flex-direction: column;
-      align-items: center;
-      padding: 15px 10px;
-      gap: 15px;
+    align-items: center;
+    padding: 15px 10px;
+    gap: 15px;
     }
     #logContainer {
-      position: static;
-      width: 100%;
-      max-height: 300px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(255, 0, 100, 0.3);
-      overflow-y: auto;
-      order: 2;
-      display: none; /* по умолчанию скрыт */
-      margin-top: 0;
-      max-height: 300px;
-      flex-shrink: 0;
-    }
-    #toggleLogBtn {
-      display: block;
-      order: 1;
-      margin-bottom: 10px;
-      width: 100%;
-      max-width: 400px;
-    }
+       /* Изменено */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    display: none; /* по умолчанию скрыт */
+    flex-direction: column !important;
+    padding: 50px 20px 20px 20px !important;
+  }
+      #toggleLogBtn {
+    display: block;
+    order: 1;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  #closeLogBtn {
+  display: block;          /* чтобы можно было задать margin */
+  margin: 10px auto 0;     /* сверху 10px, слева и справа авто — центрирование */
+  padding: 8px 16px;       /* чтобы кнопка была удобной */
+  cursor: pointer;
+  background-color: #ff3366; /* пример цвета */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  user-select: none;
+}
     #mainWrapper {
       max-width: 450px;
       width: 100%;
@@ -491,6 +507,7 @@
   </div>
 </div>
 <div id="logContainer">
+  <button id="closeLogBtn" aria-label="Закрыть логи">✕ Закрыть</button>
   <h3>Лог заданий</h3>
   <ul id="logList"></ul>
 </div>
@@ -542,6 +559,7 @@ const scoreBoard = document.getElementById("scoreBoard");
 const logContainer = document.getElementById("logContainer");
 const logList = document.getElementById("logList");
 const toggleLogBtn = document.getElementById("toggleLogBtn");
+const closeLogBtn = document.getElementById("closeLogBtn");
 const timerDisplay = document.getElementById("timerDisplay");
 
 let timerInterval = null;
@@ -557,7 +575,7 @@ function addLog(msg) {
 function getRandomTask(gender, difficulty) {
   const arr = currentTasks[gender][difficulty];
   const used = usedTasks[gender][difficulty];
-  if (used.length >= arr.length - 1) used.splice(0, 1); // Удаляем только один старый элемент, а не весь список
+  if (used.length >= arr.length - 1) used.splice(0, 1);
   let task;
   let attempts = 0;
   do {
@@ -572,10 +590,29 @@ function animateCardChange(newText, isSpecial) {
   card.style.opacity = "0";
   card.style.transform = "scale(0.8)";
   setTimeout(() => {
-    card.textContent = newText;
+    card.textContent = newText + (isSpecial ? " 🔞" : "");
+    card.classList.toggle("gold", isSpecial);
     card.style.opacity = "1";
     card.style.transform = "scale(1)";
+    for (let i = 0; i < 7; i++) {
+      const isHeart = Math.random() < 0.5;
+      createFloatingEffect(isHeart ? "❤️" : "✨", isHeart ? "#ff3366" : "#fff9a6");
+    }
   }, 400);
+}
+
+function createFloatingEffect(char, color) {
+  const effect = document.createElement("div");
+  effect.textContent = char;
+  effect.className = "floating-effect";
+  effect.style.color = color;
+  effect.style.left = Math.random() * 80 + 10 + "%";
+  effect.style.top = "90%";
+  effect.style.fontSize = (Math.random() * 24 + 20) + "px";
+  effect.style.animationDelay = (Math.random() * 0.5) + "s";
+  effect.style.zIndex = 5;
+  card.appendChild(effect);
+  setTimeout(() => effect.remove(), 3000);
 }
 
 function showNextTask() {
@@ -597,34 +634,6 @@ function updateScoreboard() {
   scoreBoard.innerHTML = `
     <b>${players.player1.name}:</b> ${score.player1} &nbsp;&nbsp;
     <b>${players.player2.name}:</b> ${score.player2}`;
-}
-function createFloatingEffect(char, color) {
-  const effect = document.createElement("div");
-  effect.textContent = char;
-  effect.className = "floating-effect";
-  effect.style.color = color;
-  effect.style.left = Math.random() * 80 + 10 + "%";
-  effect.style.top = "90%";
-  effect.style.fontSize = (Math.random() * 24 + 20) + "px";
-  effect.style.animationDelay = (Math.random() * 0.5) + "s";
-  effect.style.zIndex = 5;
-  card.appendChild(effect);
-  setTimeout(() => effect.remove(), 3000);
-}
-
-function animateCardChange(newText, isSpecial) {
-  card.style.opacity = "0";
-  card.style.transform = "scale(0.8)";
-  setTimeout(() => {
-    card.textContent = newText + (isSpecial ? " 🔞" : "");
-    card.classList.toggle("gold", isSpecial);
-    card.style.opacity = "1";
-    card.style.transform = "scale(1)";
-    for (let i = 0; i < 7; i++) {
-      const isHeart = Math.random() < 0.5;
-      createFloatingEffect(isHeart ? "❤️" : "✨", isHeart ? "#ff3366" : "#fff9a6");
-    }
-  }, 400);
 }
 
 function startGame() {
@@ -695,21 +704,40 @@ document.getElementById("resetTimerBtn").addEventListener("click", () => {
   document.getElementById("seconds").value = "";
 });
 
-toggleLogBtn.addEventListener("click", () => {
-  logContainer.style.display = logContainer.style.display === "block" ? "none" : "block";
-});
-
-window.addEventListener("resize", checkScreenSize);
-window.addEventListener("load", checkScreenSize);
 function checkScreenSize() {
   if (window.innerWidth > 850) {
     logContainer.style.display = "flex";
     toggleLogBtn.style.display = "none";
+    closeLogBtn.style.display = "none"; // скрыть кнопку закрытия на ПК
+    document.body.style.overflow = ""; // разрешить скролл страницы
   } else {
     logContainer.style.display = "none";
     toggleLogBtn.style.display = "block";
+    closeLogBtn.style.display = "block"; // показать кнопку закрытия на мобильных
+    document.body.style.overflow = ""; // разрешить скролл страницы
   }
 }
+
+toggleLogBtn.addEventListener("click", () => {
+  const isVisible = logContainer.style.display === "flex";
+  if (isVisible) {
+    logContainer.style.display = "none";
+    document.body.style.overflow = ""; // разрешить скролл страницы
+  } else {
+    logContainer.style.display = "flex";
+    document.body.style.overflow = "hidden"; // запретить скролл страницы
+    logContainer.scrollTop = logContainer.scrollHeight; // прокрутить вниз
+  }
+});
+
+closeLogBtn.addEventListener("click", () => {
+  logContainer.style.display = "none";
+  document.body.style.overflow = ""; // разрешить скролл страницы
+});
+
+window.addEventListener("resize", checkScreenSize);
+window.addEventListener("load", checkScreenSize);
 </script>
+
 </body>
 </html>
